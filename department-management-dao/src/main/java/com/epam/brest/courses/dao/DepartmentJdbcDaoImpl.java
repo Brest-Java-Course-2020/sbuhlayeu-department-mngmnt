@@ -3,6 +3,7 @@ package com.epam.brest.courses.dao;
 import com.epam.brest.courses.model.Department;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -16,6 +17,9 @@ public class DepartmentJdbcDaoImpl implements DepartmentDao {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DepartmentJdbcDaoImpl.class);
 
+    @Value("${department.select}")
+    private String selectSql;
+
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public DepartmentJdbcDaoImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -25,16 +29,14 @@ public class DepartmentJdbcDaoImpl implements DepartmentDao {
     @Override
     public List<Department> getDepartments() {
         LOGGER.trace("Get all departments {}", 0);
-        List<Department> departments = namedParameterJdbcTemplate
-                .query("SELECT d.department_id, d.department_name FROM department d ORDER BY d.department_name", new DepartmentRowMapper());
-        return departments;
+        return namedParameterJdbcTemplate.query(selectSql, new DepartmentRowMapper());
     }
 
     @Override
     public Department getDepartmentById(Integer departmentId) {
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource().addValue("department_id", departmentId);
         Department department =  namedParameterJdbcTemplate
-                .queryForObject("SELECT * FROM department WHERE department_id = :department_id",sqlParameterSource,  new DepartmentRowMapper());
+                .queryForObject(selectSql, sqlParameterSource,  new DepartmentRowMapper());
         return department;
     }
 
@@ -57,8 +59,8 @@ public class DepartmentJdbcDaoImpl implements DepartmentDao {
         @Override
         public Department mapRow(ResultSet resultSet, int i) throws SQLException {
             Department department = new Department();
-            department.setDepartmentId(resultSet.getInt("DEPARTMENT_ID"));
-            department.setDepartmentName(resultSet.getString("DEPARTMENT_NAME"));
+            department.setDepartmentId(resultSet.getInt("department_id"));
+            department.setDepartmentName(resultSet.getString("department_name"));
             return department;
         }
     }
