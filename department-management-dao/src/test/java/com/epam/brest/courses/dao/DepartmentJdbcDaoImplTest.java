@@ -30,10 +30,7 @@ public class DepartmentJdbcDaoImplTest {
     public void getDepartmentById() {
         Department departmentFirstRow = departmentDao.getDepartmentById(1);
         assertEquals("firstDepartment", departmentFirstRow.getDepartmentName());
-
-        /*Department departmentSecondRow = departmentDao.getDepartmentById(2);
-        assertEquals("secondDepartment", departmentSecondRow.getDepartmentName());*/
-
+        assertNotNull(departmentFirstRow);
     }
 
     @Test
